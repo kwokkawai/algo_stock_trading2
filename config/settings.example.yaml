@@ -5,6 +5,7 @@ broker:
 
 trading:
   env: simulate
+  paper_only: true   # HARD LOCK: all orders use Futu simulate account until set false
   markets:
     - HK
     - US

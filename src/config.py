@@ -15,7 +15,11 @@ def load_settings(path: Path | None = None) -> dict:
     if not settings_path.exists():
         settings_path = CONFIG_DIR / "settings.example.yaml"
     with open(settings_path) as f:
-        return yaml.safe_load(f)
+        data = yaml.safe_load(f)
+
+    from src.trading_policy import apply_paper_only_settings
+
+    return apply_paper_only_settings(data)
 
 
 def load_strategy_config(name: str) -> dict:

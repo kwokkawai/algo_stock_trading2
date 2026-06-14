@@ -110,8 +110,8 @@ python scripts/run_tick.py --strategy <tick_strategy> --market HK
 # 查状态
 python scripts/status.py --market HK
 
-# 实盘（需 --env real --confirm）
-python scripts/run_live.py --strategy sma_crossover --mode daily --market HK --env real --confirm
+# 实盘（仅 paper_only: false 后可用）
+# python scripts/run_live.py --strategy sma_crossover --mode daily --market HK --confirm
 ```
 
 ## 配置
@@ -125,7 +125,9 @@ python scripts/run_live.py --strategy sma_crossover --mode daily --market HK --e
 ## 安全须知
 
 - 交易密码通过环境变量 `FUTU_TRADE_PASSWORD` 传入，不要提交到 Git
-- 默认模拟盘（`TrdEnv.SIMULATE`）；实盘需 `--env real --confirm` 双确认
+- 默认 **模拟盘**（`TrdEnv.SIMULATE`）且 **`paper_only: true` 硬锁**
+- 所有下单请用 `run_paper.py` / `run_tick.py`；`run_live.py` 在 paper_only 开启时会被拒绝
+- 切换实盘：须你明确指示后，将 `config/settings.yaml` 中 `paper_only: false`
 - 生产环境务必配置 Risk Guard 熔断参数
 - Tick 策略受 `tick_max_orders_per_minute` 和 `signal_cooldown_seconds` 限制
 

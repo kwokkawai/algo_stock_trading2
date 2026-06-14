@@ -8,18 +8,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts._cli import apply_env_override, setup_logging, status_parser
+from scripts._cli import load_trading_settings, setup_logging, status_parser
 
 
 def main() -> None:
-    parser = status_parser("Query Futu account status")
+    parser = status_parser("Query Futu paper/simulate account status")
     args = parser.parse_args()
     setup_logging(args.log_level)
 
     from src.broker.futu_broker import FutuBroker
-    from src.config import load_settings
 
-    settings = apply_env_override(load_settings(), args.env)
+    settings = load_trading_settings()
     broker = FutuBroker.from_config(settings)
 
     try:

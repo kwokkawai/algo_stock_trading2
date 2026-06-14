@@ -11,7 +11,9 @@ Read [AGENTS.md](../../AGENTS.md) and [TASKS.md](../../TASKS.md) at session star
 
 - Strategy layer outputs `Signal` only — never call Futu API from `src/strategies/`
 - Broker layer in `src/broker/` — no strategy logic
-- Default trading env: **SIMULATE**; real trading requires `--confirm` + user YES
+- Default trading env: **SIMULATE** with **`trading.paper_only: true`** (hard lock)
+- **Never** run `run_live.py`, `--env real`, or set `paper_only: false` unless user explicitly says to switch to real trading
+- Real trading (when unlocked) requires `--confirm` + user YES
 - Account: **Futu HK** with `SecurityFirm.FUTUSECURITIES`
 
 ## After completing work

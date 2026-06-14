@@ -31,7 +31,11 @@ class FutuBroker:
         self._host = broker_cfg.get("host", "127.0.0.1")
         self._port = broker_cfg.get("port", 11111)
         self._security_firm_name = broker_cfg.get("security_firm", "FUTUSECURITIES")
-        self._env_name = trading_cfg.get("env", "simulate")
+
+        from src.trading_policy import resolve_trading_env
+
+        self._env_name = resolve_trading_env(config, trading_cfg.get("env", "simulate"))
+        self._paper_only = config.get("trading", {}).get("paper_only", True)
         self._trd_ctx = None
         self._quote_ctx = None
 
@@ -72,7 +76,13 @@ class FutuBroker:
             security_firm=self._security_firm(ft),
         )
         self._quote_ctx = ft.OpenQuoteContext(host=self._host, port=self._port)
-        logger.info("Connected to OpenD at %s:%s (env=%s)", self._host, self._port, self._env_name)
+        logger.info(
+            "Connected to OpenD at %s:%s (env=%s, paper_only=%s)",
+            self._host,
+            self._port,
+            self._env_name,
+            self._paper_only,
+        )
 
     def disconnect(self) -> None:
         if self._trd_ctx:
@@ -105,6 +115,13 @@ class FutuBroker:
         logger.info("Trading unlocked")
 
     def place_order(self, request: OrderRequest) -> OrderResult:
+        if self._paper_only and self._env_name != "simulate":
+            logger.error("paper_only active but env=%s — refusing order", self._env_name)
+            return OrderResult(
+                success=False,
+                message=f"paper_only lock: refusing order in env={self._env_name}",
+            )
+
         ft = self._import_futu()
         trd_side = ft.TrdSide.BUY if request.side == OrderSide.BUY else ft.TrdSide.SELL
         order_type = (

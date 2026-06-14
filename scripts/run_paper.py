@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run strategy on paper (simulate) trading."""
+"""Run strategy on paper (simulate) trading only."""
 
 from __future__ import annotations
 
@@ -8,11 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts._cli import apply_env_override, base_parser, confirm_real_trading, setup_logging
+from scripts._cli import load_trading_settings, paper_parser, setup_logging
 
 
 def main() -> None:
-    parser = base_parser("Run strategy on paper/simulate trading")
+    parser = paper_parser("Run strategy on Futu paper/simulate account only")
     parser.add_argument(
         "--mode",
         default="daily",
@@ -30,27 +30,13 @@ def main() -> None:
         action="store_true",
         help="Run one iteration then exit (useful for testing)",
     )
-    parser.add_argument(
-        "--confirm",
-        action="store_true",
-        help="Required with --env real",
-    )
     args = parser.parse_args()
 
     setup_logging(args.log_level)
 
-    if args.env == "real":
-        if not args.confirm or not confirm_real_trading():
-            print("Aborted: real trading requires --confirm and YES prompt")
-            return
-        args.env = "real"
-    else:
-        args.env = "simulate"
-
-    from src.config import load_settings
     from src.engine.runner import Engine
 
-    settings = apply_env_override(load_settings(), args.env)
+    settings = load_trading_settings()
     interval = args.data or ("1m" if args.mode == "intraday" else None)
 
     engine = Engine(

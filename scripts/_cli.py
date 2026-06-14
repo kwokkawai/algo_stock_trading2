@@ -19,34 +19,28 @@ def setup_logging(level: str = "INFO") -> None:
     )
 
 
-def base_parser(description: str) -> argparse.ArgumentParser:
+def paper_parser(description: str) -> argparse.ArgumentParser:
+    """Parser for paper/simulate trading scripts — no --env real option."""
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--strategy", required=True, help="Strategy name (registry key)")
     parser.add_argument("--market", default="HK", choices=["HK", "US"], help="Trading market")
-    parser.add_argument(
-        "--env",
-        default="simulate",
-        choices=["simulate", "real"],
-        help="Trading environment (default: simulate)",
-    )
     parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
     return parser
+
+
+def base_parser(description: str) -> argparse.ArgumentParser:
+    """Legacy parser — prefer paper_parser for simulate-only scripts."""
+    return paper_parser(description)
 
 
 def status_parser(description: str) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--market", default="HK", choices=["HK", "US"], help="Trading market")
     parser.add_argument(
-        "--env",
-        default="simulate",
-        choices=["simulate", "real"],
-        help="Trading environment (default: simulate)",
-    )
-    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -54,10 +48,22 @@ def status_parser(description: str) -> argparse.ArgumentParser:
     return parser
 
 
+def load_trading_settings() -> dict:
+    """Load settings with paper_only policy applied (always simulate when locked)."""
+    from src.config import load_settings
+
+    return load_settings()
+
+
 def apply_env_override(settings: dict, env: str) -> dict:
+    from src.trading_policy import PaperOnlyError, resolve_trading_env
+
     settings = dict(settings)
     trading = dict(settings.get("trading", {}))
-    trading["env"] = env
+    try:
+        trading["env"] = resolve_trading_env(settings, env)
+    except PaperOnlyError:
+        raise
     settings["trading"] = trading
     return settings
 

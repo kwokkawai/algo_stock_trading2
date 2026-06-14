@@ -33,7 +33,23 @@ src/broker/         ← 执行层（不改策略逻辑）
 config/settings.yaml ← 本地密钥，不进 Git
 ```
 
-**禁止：** 策略代码直接调用 Futu API；实盘下单无 `--confirm`；提交含密码的配置。
+**禁止：** 策略代码直接调用 Futu API；运行 `run_live.py`；使用 `--env real`；在未获用户明确许可时设置 `paper_only: false`；提交含密码的配置。
+
+## 模拟盘强制策略（Paper Only）
+
+**当前策略：所有交易必须走 Futu 模拟盘，直到用户明确说「切换实盘」。**
+
+| 机制 | 说明 |
+|------|------|
+| `config/settings.yaml` | `trading.paper_only: true`（硬锁） |
+| `src/trading_policy.py` | 强制 `TrdEnv.SIMULATE`，拒绝 real |
+| `run_paper.py` / `run_tick.py` | 唯一允许的下单入口 |
+| `run_live.py` | `paper_only` 为 true 时直接 BLOCKED |
+| Cursor Hook | 拦截 `run_live.py` 与 `--env real` |
+
+**Agent 不得：** 改 `paper_only: false`、运行 `run_live.py`、或绕过 policy 下单。
+
+**用户切换实盘时（仅当其明确指示）：** 将 `config/settings.yaml` 中 `paper_only: false`，然后才可用 `run_live.py --confirm`。
 
 ## 标准工作流
 

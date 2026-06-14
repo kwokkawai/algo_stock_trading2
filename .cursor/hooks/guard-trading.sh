@@ -1,30 +1,24 @@
 #!/bin/bash
-# Warn or ask before potentially dangerous live-trading shell commands.
+# Block live trading while paper_only policy is in effect.
 input=$(cat)
 command=$(echo "$input" | jq -r '.command // empty')
 
-# Allow if explicit --confirm is present
-if echo "$command" | grep -q '\-\-confirm'; then
-  echo '{ "permission": "allow" }'
-  exit 0
-fi
-
-# Block run_live without --confirm
+# Always block run_live.py (real trading script)
 if echo "$command" | grep -qE 'run_live\.py'; then
   echo '{
-    "permission": "ask",
-    "user_message": "run_live.py places REAL orders. Use --confirm and verify FUTU_TRADE_PASSWORD is set.",
-    "agent_message": "Live trading command blocked until user confirms. Prefer run_paper.py for simulation."
+    "permission": "deny",
+    "user_message": "run_live.py is disabled. All trading must use the Futu paper account via run_paper.py until you explicitly switch paper_only off.",
+    "agent_message": "Do not run run_live.py. User requires paper-only trading. Use run_paper.py or run_tick.py."
   }'
   exit 0
 fi
 
-# Warn on --env real without --confirm
-if echo "$command" | grep -qE '\-\-env real' && ! echo "$command" | grep -q '\-\-confirm'; then
+# Block any CLI attempt to use --env real
+if echo "$command" | grep -qE '\-\-env[ =]real|\-\-env=real'; then
   echo '{
-    "permission": "ask",
-    "user_message": "Real trading env requested without --confirm. Approve only if intentional.",
-    "agent_message": "Flagged --env real without --confirm."
+    "permission": "deny",
+    "user_message": "Real trading (--env real) is disabled. Use paper/simulate account only.",
+    "agent_message": "Never pass --env real. trading.paper_only is true in config."
   }'
   exit 0
 fi

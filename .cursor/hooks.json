@@ -4,7 +4,7 @@
     "beforeShellExecution": [
       {
         "command": ".cursor/hooks/guard-trading.sh",
-        "matcher": "run_live|run_paper.*--env real|TrdEnv\\.REAL"
+        "matcher": "run_live|run_paper.*--env real|run_tick.*--env real|TrdEnv\\.REAL"
       }
     ],
     "afterFileEdit": [
