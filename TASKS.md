@@ -73,7 +73,7 @@
 | INF-1 | GitHub Actions CI（lint + test） | ✅ |
 | INF-2 | Cursor Rules + AGENTS.md | ✅ |
 | INF-3 | 安全 Hooks（拦截危险实盘命令） | ✅ |
-| INF-4 | 初始化 git remote 并 push | ⬜ |
+| INF-4 | 初始化 git remote 并 push | ✅ |
 | INF-5 | PR template + branch protection 建议 | ✅ |
 
 ---
@@ -91,6 +91,7 @@
 |------|------|
 | 2026-06-14 | M1 scaffold：代码、Skills、README、PRD |
 | 2026-06-14 | 添加 AGENTS.md、TASKS.md、CI、Cursor Rules/Hooks |
+| 2026-06-14 | INF-4: push 至 github.com/kwokkawai/algo_stock_trading2 |
 
 ---
 
