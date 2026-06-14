@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Local config (secrets)
+config/settings.yaml
+
+# Logs & runtime
+logs/
+*.log
+data/cache/
+
+# Test & lint
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# IDE
+.idea/
+.vscode/
+.DS_Store

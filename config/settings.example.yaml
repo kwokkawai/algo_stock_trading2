@@ -1,0 +1,27 @@
+broker:
+  host: 127.0.0.1
+  port: 11111
+  security_firm: FUTUSECURITIES
+
+trading:
+  env: simulate
+  markets:
+    - HK
+    - US
+
+risk:
+  max_notional_per_order: 50000
+  max_position_pct: 0.2
+  daily_loss_limit: 10000
+  signal_cooldown_seconds: 60
+  tick_max_orders_per_minute: 10
+  allowed_symbols:
+    HK:
+      - HK.00700
+      - HK.09988
+    US:
+      - US.AAPL
+      - US.MSFT
+
+logging:
+  level: INFO

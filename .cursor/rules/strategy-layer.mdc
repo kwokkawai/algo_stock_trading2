@@ -1,0 +1,39 @@
+---
+description: Rules for implementing trading strategies in myAlgo2
+globs: src/strategies/**,config/strategies/**,src/strategy/**
+alwaysApply: false
+---
+
+# Strategy Layer Rules
+
+Use the `algo-strategy` skill when editing these files.
+
+## Required pattern
+
+```python
+class MyStrategy(BaseStrategy):
+    name = "my_strategy"
+
+    def __init__(self, params: dict):
+        super().__init__(params)
+        self.subscription = DataSubscription(
+            symbols=params.get("symbols", []),
+            intervals=[params.get("interval", "1d")],
+            tick=params.get("tick", False),
+        )
+```
+
+## Checklist for new strategy
+
+- [ ] Extends `BaseStrategy`
+- [ ] Declares `DataSubscription` matching `on_bar` / `on_tick`
+- [ ] Parameters from YAML via `self.params`
+- [ ] Registered in `src/strategy/registry.py`
+- [ ] Unit test in `tests/test_<name>.py`
+- [ ] No `import futu` in strategy files
+
+## Runner mapping
+
+- Daily K → `run_paper.py --mode daily`
+- 1m → `run_paper.py --mode intraday --data 1m`
+- Tick → `run_tick.py` (separate process)

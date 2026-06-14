@@ -1,0 +1,27 @@
+---
+description: Core project conventions for myAlgo2 algo trading agent
+alwaysApply: true
+---
+
+# myAlgo2 Core Rules
+
+Read [AGENTS.md](../../AGENTS.md) and [TASKS.md](../../TASKS.md) at session start.
+
+## Architecture
+
+- Strategy layer outputs `Signal` only — never call Futu API from `src/strategies/`
+- Broker layer in `src/broker/` — no strategy logic
+- Default trading env: **SIMULATE**; real trading requires `--confirm` + user YES
+- Account: **Futu HK** with `SecurityFirm.FUTUSECURITIES`
+
+## After completing work
+
+1. Run `make check`
+2. Update [TASKS.md](../../TASKS.md) checkbox for the task ID
+3. Do not commit secrets (`config/settings.yaml`, `.env`, passwords)
+
+## Code style
+
+- Python 3.10+, type hints where practical
+- Match existing module layout; minimal diff
+- New strategy = `.py` + `config/strategies/*.yaml` + registry entry + test

@@ -1,0 +1,27 @@
+---
+description: Rules for Futu broker and order execution code
+globs: src/broker/**,scripts/run_live.py,scripts/status.py,scripts/run_paper.py
+alwaysApply: false
+---
+
+# Broker / Execution Rules
+
+Use the `futu-order-execution` skill when editing these files.
+
+## Futu HK defaults
+
+- `SecurityFirm.FUTUSECURITIES`
+- OpenD: `127.0.0.1:11111`
+- HK codes: `HK.00700` | US codes: `US.AAPL`
+
+## Safety
+
+- Never hardcode `FUTU_TRADE_PASSWORD`
+- Never default `trd_env` to REAL
+- Log order_id on success; log full error on failure
+- Quote subscription belongs in `src/data/`, not broker
+
+## Do not add here
+
+- Indicators, SMA, signal generation
+- Strategy-specific logic

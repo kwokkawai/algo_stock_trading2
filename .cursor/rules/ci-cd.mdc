@@ -1,0 +1,31 @@
+---
+description: CI/CD and testing conventions for myAlgo2
+globs: .github/**,tests/**,pyproject.toml,Makefile,requirements*.txt
+alwaysApply: false
+---
+
+# CI/CD Rules
+
+Use the `ci-cd` skill for pipeline changes.
+
+## Local gate (must pass before merge)
+
+```bash
+make check   # ruff + pytest
+```
+
+## CI scope
+
+- **In CI:** lint, unit tests (no OpenD/Futu network)
+- **Not in CI:** live/simulation trading against OpenD (local only)
+
+## Adding tests
+
+- Pure logic tests in `tests/` — mock broker, no `futu-api` import required
+- Name: `test_<module>.py`
+- Run: `pytest -v`
+
+## Workflow files
+
+- `.github/workflows/ci.yml` — main CI on push/PR
+- Do not add secrets to workflows; Futu passwords stay local

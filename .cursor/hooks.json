@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/guard-trading.sh",
+        "matcher": "run_live|run_paper.*--env real|TrdEnv\\.REAL"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/post-edit-python.sh",
+        "matcher": "Write|Edit"
+      }
+    ],
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/session-context.sh"
+      }
+    ]
+  }
+}

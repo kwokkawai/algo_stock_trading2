@@ -1,0 +1,9 @@
+name: sma_crossover
+market: HK
+symbols:
+  - HK.00700
+params:
+  interval: "1d"
+  fast_period: 10
+  slow_period: 30
+  qty: 100
