@@ -4,7 +4,7 @@
 >
 > 图例：⬜ 待办 | 🔄 进行中 | ✅ 完成 | ⏸ 阻塞
 
-**当前阶段：** M2 完成 → **M3 Intraday + 风控**
+**当前阶段：** M2 + Journal + Automation 完成 → **M3 Intraday + 风控**
 
 ---
 
@@ -16,7 +16,7 @@
 | **M2** | 日 K Runner + SMA + 模拟盘联调 | ✅ |
 | **M3** | 1m intraday Runner + Risk Guard 验证 | ⬜ |
 | **M4** | Tick Runner + 频率风控 | ⬜ |
-| **M5** | 实盘路径 + 结构化日志 | ⬜ |
+| **M5** | 实盘路径 + 可观测性 | 🔄 |
 | **M6** | 回测模块（Phase 2） | ⬜ |
 | **M7** | Web UI（Phase 2） | ⬜ |
 
@@ -76,14 +76,16 @@
 | INF-3 | 安全 Hooks（拦截危险实盘命令） | ✅ |
 | INF-4 | 初始化 git remote 并 push | ✅ |
 | INF-5 | PR template + branch protection 建议 | ✅ |
+| INF-6 | Shell + launchd 定时自动化 | ✅ |
 
 ---
 
 ## Next（Agent 优先处理）
 
-1. 用户按 [docs/TESTING.md](docs/TESTING.md) 完成功能验收
-2. **M3-1** — 交易时段跑 `run_paper.py --mode intraday --data 1m --once`
-3. **M3-2** — 验证 Risk Guard 白名单与 notional 上限
+1. 用户按 [docs/TESTING.md](docs/TESTING.md) Phase A–H 验收
+2. 定时任务：`launchctl list | grep myalgo2` 确认已加载（见 [docs/AUTOMATION.md](docs/AUTOMATION.md)）
+3. **M3-1** — 交易时段跑 `run_paper.py --mode intraday --data 1m --once`
+4. **M3-2** — 验证 Risk Guard 白名单与 notional 上限
 
 ---
 
@@ -97,6 +99,7 @@
 | 2026-06-14 | M2 联调：修复 config ROOT 路径；K 线仅对最新 bar 下单；无持仓拒绝 SELL；notional 上限 100k；status.py 无需 --strategy |
 | 2026-06-14 | **第一梯队策略**：ema_crossover、donchian_breakout、bollinger_rsi、momentum_rotation + indicators + 单元测试；STRATEGY_GUIDE 第 2 节 |
 | 2026-06-14 | **M5 journal**：SQLite 交易日志、Futu 订单/成交同步、日终 snapshot、report.py 日/周/月报表 |
+| 2026-06-14 | **Automation**：daily_run / weekly_report / monthly_report + launchd + docs/AUTOMATION.md；launchd PATH 修复 |
 
 ---
 

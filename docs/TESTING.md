@@ -430,6 +430,10 @@ Snapshots     : 1
 
 ### H6 — 建议的日常流程
 
+完整 **shell + launchd** 自动化见 **[AUTOMATION.md](AUTOMATION.md)**。
+
+手动流程：
+
 ```
 收盘后:
   snapshot_account.py --type eod
@@ -438,6 +442,14 @@ Snapshots     : 1
 
 周末:  report.py --period week
 月初:  report.py --period month
+```
+
+或一键：
+
+```bash
+make daily-run
+make weekly-report
+make monthly-report
 ```
 
 ### 若失败
@@ -537,10 +549,12 @@ SMA 只在 **快线上穿/下穿慢线** 时信号。最新一根 K 无交叉则
 
 | 文档 | 内容 |
 |------|------|
-| [STRATEGY_GUIDE.md](STRATEGY_GUIDE.md) | **当前 SMA 策略说明 + 如何请 Agent 改策略** |
+| [STRATEGY_GUIDE.md](STRATEGY_GUIDE.md) | **第一梯队策略 + Agent 修改指南** |
 | [WATCHLIST.md](WATCHLIST.md) | **多标的 watchlist 配置** |
+| [AUTOMATION.md](AUTOMATION.md) | **Shell + launchd 定时任务** |
 | [README.md](../README.md) | 架构与快速开始 |
 | [AGENTS.md](../AGENTS.md) | Agent 工作流 |
+| [AUTOMATION.md](AUTOMATION.md) | **Shell + launchd 定时自动化** |
 | [TASKS.md](../TASKS.md) | 里程碑与 Next 任务 |
 | [PRD.md](../PRD.md) | 功能设计 |
 

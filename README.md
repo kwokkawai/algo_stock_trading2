@@ -198,13 +198,22 @@ GitHub Actions：push/PR 时自动跑 lint + unit tests（见 `.github/workflows
 
 配置见 `config/settings.yaml` → `journal:` 段。
 
+**定时自动化（shell + launchd）：** 自动跑 M1/M2 与日/周/月报表，见 [docs/AUTOMATION.md](docs/AUTOMATION.md)。
+
+```bash
+make daily-run          # 手动跑完整日流程
+make install-scheduler  # 安装 macOS 定时任务
+```
+
 ## 路线图
 
 - [x] 项目 scaffold + Skills + 文档
 - [x] Cursor 协作（AGENTS.md、TASKS.md、Rules、Hooks、CI）
-- [ ] Futu Broker 模拟盘联调
-- [ ] 日 K / 1m Runner 联调
-- [ ] Tick Runner + 频率风控
-- [ ] 实盘路径 + 结构化日志
+- [x] Futu Broker 模拟盘联调（M2）
+- [x] 第一梯队 5 策略 + Journal + 日/周/月报表
+- [x] Shell + launchd 定时自动化
+- [ ] 1m intraday Runner 联调（M3）
+- [ ] Tick Runner + 频率风控（M4）
+- [ ] 实盘路径 + 结构化 JSON 日志（M5 剩余）
 - [ ] 回测模块（Phase 2）
 - [ ] Web UI（Phase 2）

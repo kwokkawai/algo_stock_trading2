@@ -11,6 +11,7 @@
 | [README.md](README.md) | 快速开始、架构概览 |
 | [PRD.md](PRD.md) | 功能需求、接口契约 |
 | [docs/TESTING.md](docs/TESTING.md) | **逐步功能测试指南** |
+| [docs/AUTOMATION.md](docs/AUTOMATION.md) | **Shell + launchd 定时任务** |
 | [docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md) | **当前策略说明与 Agent 修改指南** |
 | [docs/WATCHLIST.md](docs/WATCHLIST.md) | **多标的 watchlist 与白名单配置** |
 | [TASKS.md](TASKS.md) | **当前任务看板**（完成工作后必须更新） |
@@ -72,6 +73,11 @@ make lint           # ruff
 
 # 模拟盘单次运行
 .venv/bin/python scripts/run_paper.py --strategy sma_crossover --mode daily --market HK --once
+
+# 定时自动化（见 docs/AUTOMATION.md）
+make daily-run
+make install-scheduler
+launchctl list | grep myalgo2   # 查看 launchd 是否已加载
 ```
 
 ## CI/CD
