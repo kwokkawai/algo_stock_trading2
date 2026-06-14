@@ -10,6 +10,7 @@
 |------|------|
 | [README.md](README.md) | 快速开始、架构概览 |
 | [PRD.md](PRD.md) | 功能需求、接口契约 |
+| [docs/TESTING.md](docs/TESTING.md) | **逐步功能测试指南** |
 | [TASKS.md](TASKS.md) | **当前任务看板**（完成工作后必须更新） |
 
 ## Agent 分工

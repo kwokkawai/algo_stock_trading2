@@ -169,6 +169,8 @@ make check         # 本地 CI（与 GitHub Actions 一致）
 
 GitHub Actions：push/PR 时自动跑 lint + unit tests（见 `.github/workflows/ci.yml`）。
 
+**功能测试：** 逐步验证模拟盘、策略、风控，见 [docs/TESTING.md](docs/TESTING.md)。
+
 ## 路线图
 
 - [x] 项目 scaffold + Skills + 文档

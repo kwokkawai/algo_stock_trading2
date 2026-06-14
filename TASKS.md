@@ -80,8 +80,9 @@
 
 ## Next（Agent 优先处理）
 
-1. **M3-1** — 交易时段跑 `run_paper.py --mode intraday --data 1m --once`
-2. **M3-2** — 验证 Risk Guard 白名单与 notional 上限
+1. 用户按 [docs/TESTING.md](docs/TESTING.md) 完成功能验收
+2. **M3-1** — 交易时段跑 `run_paper.py --mode intraday --data 1m --once`
+3. **M3-2** — 验证 Risk Guard 白名单与 notional 上限
 
 ---
 
