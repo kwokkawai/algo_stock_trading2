@@ -391,6 +391,8 @@ SMA 只在 **快线上穿/下穿慢线** 时信号。最新一根 K 无交叉则
 
 | 文档 | 内容 |
 |------|------|
+| [STRATEGY_GUIDE.md](STRATEGY_GUIDE.md) | **当前 SMA 策略说明 + 如何请 Agent 改策略** |
+| [WATCHLIST.md](WATCHLIST.md) | **多标的 watchlist 配置** |
 | [README.md](../README.md) | 架构与快速开始 |
 | [AGENTS.md](../AGENTS.md) | Agent 工作流 |
 | [TASKS.md](../TASKS.md) | 里程碑与 Next 任务 |

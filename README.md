@@ -61,6 +61,8 @@ python scripts/status.py --market HK
 | 香港 | `HK.{5位代码}` | `HK.00700` | `HK` |
 | 美国 | `US.{Ticker}` | `US.AAPL` | `US` |
 
+多标的 watchlist 配置见 [docs/WATCHLIST.md](docs/WATCHLIST.md)（策略 `symbols` + 风控白名单两处）。
+
 ## 行情粒度
 
 策略通过 `DataSubscription` 声明所需数据，Engine 自动合并订阅：
@@ -170,6 +172,10 @@ make check         # 本地 CI（与 GitHub Actions 一致）
 GitHub Actions：push/PR 时自动跑 lint + unit tests（见 `.github/workflows/ci.yml`）。
 
 **功能测试：** 逐步验证模拟盘、策略、风控，见 [docs/TESTING.md](docs/TESTING.md)。
+
+**策略说明：** 当前 SMA 算法原理与如何请 Agent 改策略，见 [docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md)。
+
+**Watchlist：** 添加多只股票，见 [docs/WATCHLIST.md](docs/WATCHLIST.md)。
 
 ## 路线图
 

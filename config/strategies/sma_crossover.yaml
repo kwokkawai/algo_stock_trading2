@@ -1,7 +1,14 @@
+# Strategy watchlist — symbols monitored by sma_crossover.
+# Also add every symbol to config/settings.yaml → risk.allowed_symbols
+# Code format: HK.00700 (not 0700.HK). See docs/WATCHLIST.md
+
 name: sma_crossover
 market: HK
 symbols:
-  - HK.00700
+  - HK.00700    # 腾讯控股
+  - HK.09988    # 阿里巴巴-SW
+  - HK.02318    # 中国平安
+  - HK.03690    # 美团-W
 params:
   interval: "1d"
   fast_period: 10

@@ -16,13 +16,19 @@ risk:
   daily_loss_limit: 10000
   signal_cooldown_seconds: 60
   tick_max_orders_per_minute: 10
+  # Must include every symbol from config/strategies/*.yaml → symbols
+  # Futu format: HK.00700 (5 digits), US.AAPL — see docs/WATCHLIST.md
   allowed_symbols:
     HK:
-      - HK.00700
-      - HK.09988
+      - HK.00700    # 腾讯
+      - HK.09988    # 阿里巴巴-SW
+      - HK.02318    # 中国平安
+      - HK.03690    # 美团-W
+      - HK.00005    # 汇丰（示例，可按需删除）
     US:
       - US.AAPL
       - US.MSFT
+      - US.TSLA     # 示例
 
 logging:
   level: INFO

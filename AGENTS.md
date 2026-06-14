@@ -11,6 +11,8 @@
 | [README.md](README.md) | 快速开始、架构概览 |
 | [PRD.md](PRD.md) | 功能需求、接口契约 |
 | [docs/TESTING.md](docs/TESTING.md) | **逐步功能测试指南** |
+| [docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md) | **当前策略说明与 Agent 修改指南** |
+| [docs/WATCHLIST.md](docs/WATCHLIST.md) | **多标的 watchlist 与白名单配置** |
 | [TASKS.md](TASKS.md) | **当前任务看板**（完成工作后必须更新） |
 
 ## Agent 分工
