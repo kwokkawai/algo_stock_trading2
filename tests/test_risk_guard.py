@@ -18,7 +18,9 @@ def test_whitelist_rejects_unknown_symbol():
     signals = [
         Signal(symbol="HK.99999", side=SignalSide.BUY, qty=100, price=10.0, reason="test")
     ]
-    assert guard.validate(signals) == []
+    result = guard.validate(signals)
+    assert result.approved == []
+    assert len(result.rejected) == 1
 
 
 def test_approves_whitelisted_symbol():
@@ -26,9 +28,9 @@ def test_approves_whitelisted_symbol():
     signals = [
         Signal(symbol="HK.00700", side=SignalSide.BUY, qty=100, price=10.0, reason="test")
     ]
-    orders = guard.validate(signals, account_total=1_000_000)
-    assert len(orders) == 1
-    assert orders[0].symbol == "HK.00700"
+    result = guard.validate(signals, account_total=1_000_000)
+    assert len(result.approved) == 1
+    assert result.approved[0].symbol == "HK.00700"
 
 
 def test_rejects_sell_without_position():
@@ -36,7 +38,8 @@ def test_rejects_sell_without_position():
     signals = [
         Signal(symbol="HK.00700", side=SignalSide.SELL, qty=100, price=10.0, reason="test")
     ]
-    assert guard.validate(signals, positions=[]) == []
+    result = guard.validate(signals, positions=[])
+    assert result.approved == []
 
 
 def test_notional_limit():
@@ -44,4 +47,5 @@ def test_notional_limit():
     signals = [
         Signal(symbol="HK.00700", side=SignalSide.BUY, qty=100, price=100.0, reason="test")
     ]
-    assert guard.validate(signals) == []
+    result = guard.validate(signals)
+    assert result.approved == []

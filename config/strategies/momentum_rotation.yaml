@@ -1,0 +1,14 @@
+# Tier 1 — Momentum rotation (top N within watchlist)
+
+name: momentum_rotation
+market: HK
+symbols:
+  - HK.00700
+  - HK.09988
+  - HK.02318
+  - HK.03690
+params:
+  interval: "1d"
+  lookback: 20
+  top_n: 1
+  qty: 100

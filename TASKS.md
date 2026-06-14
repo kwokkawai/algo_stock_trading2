@@ -61,7 +61,8 @@
 | ID | 任务 | 状态 |
 |----|------|------|
 | M5-1 | `run_live.py --confirm` 端到端验证 | ⬜ |
-| M5-2 | 结构化 JSON 日志 | ⬜ |
+| M5-2 | 结构化 JSON 日志 | 🔄 |
+| M5-2a | SQLite journal + report/sync/snapshot CLI | ✅ |
 | M5-3 | 订单失败告警（日志级别 / 可选 webhook） | ⬜ |
 
 ---
@@ -94,6 +95,8 @@
 | 2026-06-14 | 添加 AGENTS.md、TASKS.md、CI、Cursor Rules/Hooks |
 | 2026-06-14 | INF-4: push 至 github.com/kwokkawai/algo_stock_trading2 |
 | 2026-06-14 | M2 联调：修复 config ROOT 路径；K 线仅对最新 bar 下单；无持仓拒绝 SELL；notional 上限 100k；status.py 无需 --strategy |
+| 2026-06-14 | **第一梯队策略**：ema_crossover、donchian_breakout、bollinger_rsi、momentum_rotation + indicators + 单元测试；STRATEGY_GUIDE 第 2 节 |
+| 2026-06-14 | **M5 journal**：SQLite 交易日志、Futu 订单/成交同步、日终 snapshot、report.py 日/周/月报表 |
 
 ---
 

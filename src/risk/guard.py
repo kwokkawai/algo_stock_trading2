@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class ValidationResult:
+    approved: list[OrderRequest] = field(default_factory=list)
+    rejected: list[tuple[Signal, str]] = field(default_factory=list)
+
+
+@dataclass
 class RiskConfig:
     max_notional_per_order: float = 50000
     max_position_pct: float = 0.2
@@ -55,19 +61,21 @@ class RiskGuard:
         signals: list[Signal],
         positions: list[Position] | None = None,
         account_total: float = 0,
-    ) -> list[OrderRequest]:
+    ) -> ValidationResult:
         if self.is_halted():
             logger.warning("Risk halt: daily loss limit reached")
-            return []
+            return ValidationResult()
 
         positions = positions or []
         approved: list[OrderRequest] = []
+        rejected: list[tuple[Signal, str]] = []
 
         for signal in signals:
             reason = self._check_signal(signal, positions, account_total)
             if reason:
                 logger.warning("Signal rejected [%s]: %s", signal.symbol, reason)
                 self._rejected_count += 1
+                rejected.append((signal, reason))
                 continue
 
             self._record_order()
@@ -84,7 +92,7 @@ class RiskGuard:
                 )
             )
 
-        return approved
+        return ValidationResult(approved=approved, rejected=rejected)
 
     def _check_signal(
         self,

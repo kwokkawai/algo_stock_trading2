@@ -1,0 +1,14 @@
+# Tier 1 — EMA crossover. See docs/STRATEGY_GUIDE.md
+
+name: ema_crossover
+market: HK
+symbols:
+  - HK.00700
+  - HK.09988
+  - HK.02318
+  - HK.03690
+params:
+  interval: "1d"
+  fast_period: 12
+  slow_period: 26
+  qty: 100

@@ -11,6 +11,12 @@ from src.broker.futu_broker import FutuBroker
 from src.config import load_settings, load_strategy_config
 from src.data.bar_feed import BarFeed
 from src.data.tick_feed import TickFeed
+from src.journal.engine_hooks import (
+    log_signals,
+    open_journal,
+    record_account_snapshot,
+)
+from src.journal.sync import sync_fills
 from src.risk.guard import RiskGuard
 from src.strategy.base import StrategyContext
 from src.strategy.registry import get_strategy
@@ -49,6 +55,9 @@ class Engine:
             params=params,
             market=self._strategy_config.get("market", market),
         )
+        self._strategy_name = strategy_name
+        self._journal = open_journal(self._settings)
+        self._run_id: str | None = None
 
     def run(self, once: bool = False) -> None:
         if self._mode == "tick":
@@ -58,6 +67,7 @@ class Engine:
 
     def _run_bar(self, once: bool = False) -> None:
         self._broker.connect()
+        self._begin_run()
         try:
             if self._broker.is_real:
                 self._broker.unlock()
@@ -84,11 +94,13 @@ class Engine:
                 time.sleep(sleep_seconds)
 
         finally:
+            self._end_run()
             self._strategy.on_stop(self._ctx)
             self._broker.disconnect()
 
     def _run_tick(self, once: bool = False) -> None:
         self._broker.connect()
+        self._begin_run()
         try:
             if self._broker.is_real:
                 self._broker.unlock()
@@ -109,8 +121,46 @@ class Engine:
                 time.sleep(1)
 
         finally:
+            self._end_run()
             self._strategy.on_stop(self._ctx)
             self._broker.disconnect()
+
+    def _begin_run(self) -> None:
+        if self._journal is None:
+            return
+        self._run_id = self._journal.new_run_id()
+        self._journal.start_session(
+            self._run_id,
+            strategy_name=self._strategy_name,
+            market=self._market,
+            mode=self._mode,
+            env=self._broker.env_name,
+        )
+        record_account_snapshot(
+            self._broker,
+            self._journal,
+            snapshot_type="run_start",
+            strategy_name=self._strategy_name,
+            run_id=self._run_id,
+            market=self._market,
+        )
+
+    def _end_run(self) -> None:
+        if self._journal is None or self._run_id is None:
+            return
+        try:
+            sync_fills(self._broker, self._journal)
+        except Exception as exc:
+            logger.warning("Fill sync failed: %s", exc)
+        record_account_snapshot(
+            self._broker,
+            self._journal,
+            snapshot_type="run_end",
+            strategy_name=self._strategy_name,
+            run_id=self._run_id,
+            market=self._market,
+        )
+        self._journal.end_session(self._run_id)
 
     def _process_bars(self, bars, interval: str) -> None:
         """Warm up strategy on history; execute signals only on the latest bar per symbol."""
@@ -137,13 +187,54 @@ class Engine:
         if not signals:
             return
 
+        log_signals(
+            self._journal,
+            signals,
+            strategy_name=self._strategy_name,
+            run_id=self._run_id,
+        )
+
         account = self._broker.get_account_info()
-        orders = self._risk.validate(
+        result = self._risk.validate(
             signals,
             positions=self._ctx.positions,
             account_total=account.total_assets,
         )
-        for order in orders:
-            result = self._broker.place_order(order)
-            if not result.success:
-                logger.error("Order failed: %s", result.message)
+
+        if self._journal:
+            for signal, reason in result.rejected:
+                self._journal.record_risk_rejected(
+                    signal,
+                    reason,
+                    strategy_name=self._strategy_name,
+                    run_id=self._run_id,
+                )
+
+        for order in result.approved:
+            placed = self._broker.place_order(order)
+            if not placed.success:
+                logger.error("Order failed: %s", placed.message)
+                if self._journal:
+                    self._journal.record_order_failed(
+                        symbol=order.symbol,
+                        side=order.side.value,
+                        qty=order.qty,
+                        price=order.price,
+                        reason=order.reason,
+                        message=placed.message,
+                        strategy_name=self._strategy_name,
+                        run_id=self._run_id,
+                    )
+                continue
+            if self._journal and placed.order_id:
+                self._journal.record_order_submitted(
+                    order_id=placed.order_id,
+                    symbol=order.symbol,
+                    side=order.side.value,
+                    qty=order.qty,
+                    price=order.price,
+                    reason=order.reason,
+                    env=self._broker.env_name,
+                    strategy_name=self._strategy_name,
+                    run_id=self._run_id,
+                )

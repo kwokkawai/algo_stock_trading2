@@ -8,6 +8,8 @@ from typing import Any
 
 from src.models.order import (
     AccountInfo,
+    DealRecord,
+    OrderRecord,
     OrderRequest,
     OrderResult,
     OrderSide,
@@ -46,6 +48,10 @@ class FutuBroker:
     @property
     def is_real(self) -> bool:
         return self._env_name == "real"
+
+    @property
+    def env_name(self) -> str:
+        return self._env_name
 
     def _import_futu(self):
         import futu as ft
@@ -204,3 +210,102 @@ class FutuBroker:
             market_val=float(row.get("market_val", 0)),
             env=self._env_name,
         )
+
+    def get_orders(
+        self,
+        *,
+        order_id: str = "",
+        code: str = "",
+        start: str = "",
+        end: str = "",
+        history: bool = False,
+    ) -> list[OrderRecord]:
+        ft = self._import_futu()
+        if history:
+            ret, data = self._trd_ctx.history_order_list_query(
+                code=code,
+                start=start,
+                end=end,
+                trd_env=self._trd_env(ft),
+            )
+        else:
+            ret, data = self._trd_ctx.order_list_query(
+                order_id=order_id,
+                code=code,
+                start=start,
+                end=end,
+                trd_env=self._trd_env(ft),
+            )
+        if ret != ft.RET_OK or data is None or data.empty:
+            return []
+        return [self._row_to_order(row) for _, row in data.iterrows()]
+
+    def get_deals(
+        self,
+        *,
+        code: str = "",
+        start: str = "",
+        end: str = "",
+        history: bool = False,
+    ) -> list[DealRecord]:
+        ft = self._import_futu()
+        if history:
+            ret, data = self._trd_ctx.history_deal_list_query(
+                code=code,
+                start=start,
+                end=end,
+                trd_env=self._trd_env(ft),
+            )
+        else:
+            ret, data = self._trd_ctx.deal_list_query(
+                code=code,
+                trd_env=self._trd_env(ft),
+            )
+        if ret != ft.RET_OK or data is None or data.empty:
+            return []
+        deals = [self._row_to_deal(row) for _, row in data.iterrows()]
+        if history or not start:
+            return deals
+        return [d for d in deals if self._in_date_range(d.create_time, start, end)]
+
+    def _row_to_order(self, row) -> OrderRecord:
+        side_raw = str(row.get("trd_side", "BUY"))
+        side = OrderSide.BUY if "BUY" in side_raw.upper() else OrderSide.SELL
+        dealt_avg = row.get("dealt_avg_price")
+        return OrderRecord(
+            order_id=str(row.get("order_id", "")),
+            symbol=str(row.get("code", "")),
+            side=side,
+            qty=int(row.get("qty", 0)),
+            price=float(row.get("price", 0) or 0),
+            order_status=str(row.get("order_status", "")),
+            dealt_qty=int(row.get("dealt_qty", 0) or 0),
+            dealt_avg_price=float(dealt_avg) if dealt_avg not in (None, "N/A", "") else None,
+            create_time=str(row.get("create_time", "")),
+            updated_time=str(row.get("updated_time", "")),
+            env=self._env_name,
+        )
+
+    def _row_to_deal(self, row) -> DealRecord:
+        side_raw = str(row.get("trd_side", "BUY"))
+        side = OrderSide.BUY if "BUY" in side_raw.upper() else OrderSide.SELL
+        return DealRecord(
+            deal_id=str(row.get("deal_id", "")),
+            order_id=str(row.get("order_id", "")),
+            symbol=str(row.get("code", "")),
+            side=side,
+            qty=int(row.get("qty", 0)),
+            price=float(row.get("price", 0) or 0),
+            create_time=str(row.get("create_time", "")),
+            env=self._env_name,
+        )
+
+    @staticmethod
+    def _in_date_range(ts: str, start: str, end: str) -> bool:
+        if not ts:
+            return True
+        if start and ts < start:
+            return False
+        if end and ts > end:
+            return False
+        return True

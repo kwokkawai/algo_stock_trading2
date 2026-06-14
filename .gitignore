@@ -13,6 +13,7 @@ config/settings.yaml
 logs/
 *.log
 data/cache/
+data/journal/*.db
 
 # Test & lint
 .pytest_cache/

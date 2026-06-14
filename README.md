@@ -173,9 +173,30 @@ GitHub Actions：push/PR 时自动跑 lint + unit tests（见 `.github/workflows
 
 **功能测试：** 逐步验证模拟盘、策略、风控，见 [docs/TESTING.md](docs/TESTING.md)。
 
-**策略说明：** 当前 SMA 算法原理与如何请 Agent 改策略，见 [docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md)。
+**策略说明：** 第一梯队 5 个日 K 策略（SMA/EMA/Donchian/Bollinger+RSI/动量轮动），见 [docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md)。
 
 **Watchlist：** 添加多只股票，见 [docs/WATCHLIST.md](docs/WATCHLIST.md)。
+
+**绩效分析：** SQLite 交易日志与日/周/月报表，见下方「Journal」一节。
+
+## Journal（交易日志与绩效）
+
+所有 `run_paper.py` 运行会自动写入 SQLite（`data/journal/trades.db`），记录信号、风控拒绝、下单与账户快照。
+
+```bash
+# 日终手动 snapshot（建议收盘后 cron）
+.venv/bin/python scripts/snapshot_account.py --type eod --market HK
+
+# 从 Futu 同步订单/成交
+.venv/bin/python scripts/sync_fills.py
+
+# 日 / 周 / 月 报表
+.venv/bin/python scripts/report.py --period day
+.venv/bin/python scripts/report.py --period week --strategy sma_crossover
+.venv/bin/python scripts/report.py --period month --export json
+```
+
+配置见 `config/settings.yaml` → `journal:` 段。
 
 ## 路线图
 

@@ -72,3 +72,74 @@ def confirm_real_trading() -> bool:
     print("\n⚠️  REAL TRADING MODE — actual orders will be placed.")
     answer = input("Type 'YES' to confirm: ")
     return answer.strip() == "YES"
+
+
+def report_parser(description: str) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "--period",
+        default="day",
+        choices=["day", "week", "month"],
+        help="Report aggregation period",
+    )
+    parser.add_argument("--strategy", default=None, help="Filter by strategy name")
+    parser.add_argument(
+        "--date",
+        default=None,
+        help="Anchor date YYYY-MM-DD (default: today in journal timezone)",
+    )
+    parser.add_argument(
+        "--export",
+        default=None,
+        choices=["csv", "json"],
+        help="Export format instead of plain text",
+    )
+    parser.add_argument("--output", default=None, help="Output path for --export csv")
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+    )
+    return parser
+
+
+def snapshot_parser(description: str) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--market", default="HK", choices=["HK", "US"])
+    parser.add_argument(
+        "--type",
+        default="eod",
+        choices=["eod", "manual", "run_start", "run_end"],
+        help="Snapshot label",
+    )
+    parser.add_argument("--strategy", default=None, help="Optional strategy tag")
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+    )
+    return parser
+
+
+def sync_parser(description: str) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--start", default="", help="Start date YYYY-MM-DD")
+    parser.add_argument("--end", default="", help="End date YYYY-MM-DD")
+    parser.add_argument(
+        "--history",
+        action="store_true",
+        default=True,
+        help="Include history_order/deal queries when date range set (default: on)",
+    )
+    parser.add_argument(
+        "--no-history",
+        action="store_false",
+        dest="history",
+        help="Only sync today's orders/deals",
+    )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+    )
+    return parser

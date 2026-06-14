@@ -32,3 +32,8 @@ risk:
 
 logging:
   level: INFO
+
+journal:
+  enabled: true
+  db_path: data/journal/trades.db
+  timezone: Asia/Hong_Kong

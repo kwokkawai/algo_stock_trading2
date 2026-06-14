@@ -45,3 +45,32 @@ class AccountInfo:
     cash: float
     market_val: float
     env: Literal["simulate", "real"] = "simulate"
+
+
+@dataclass
+class OrderRecord:
+    order_id: str
+    symbol: str
+    side: OrderSide
+    qty: int
+    price: float | None
+    order_status: str
+    dealt_qty: int
+    dealt_avg_price: float | None
+    create_time: str
+    updated_time: str
+    env: Literal["simulate", "real"] = "simulate"
+    strategy_name: str | None = None
+    reason: str | None = None
+
+
+@dataclass
+class DealRecord:
+    deal_id: str
+    order_id: str
+    symbol: str
+    side: OrderSide
+    qty: int
+    price: float
+    create_time: str
+    env: Literal["simulate", "real"] = "simulate"

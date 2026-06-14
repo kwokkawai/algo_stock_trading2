@@ -1,0 +1,17 @@
+# Tier 1 — Bollinger Bands + RSI mean reversion
+
+name: bollinger_rsi
+market: HK
+symbols:
+  - HK.00700
+  - HK.09988
+  - HK.02318
+  - HK.03690
+params:
+  interval: "1d"
+  bb_period: 20
+  bb_std: 2.0
+  rsi_period: 14
+  rsi_buy: 30
+  rsi_sell: 70
+  qty: 100

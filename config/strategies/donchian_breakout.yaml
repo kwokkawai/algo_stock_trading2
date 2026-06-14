@@ -1,0 +1,14 @@
+# Tier 1 — Donchian channel breakout
+
+name: donchian_breakout
+market: HK
+symbols:
+  - HK.00700
+  - HK.09988
+  - HK.02318
+  - HK.03690
+params:
+  interval: "1d"
+  entry_lookback: 20
+  exit_lookback: 10
+  qty: 100
