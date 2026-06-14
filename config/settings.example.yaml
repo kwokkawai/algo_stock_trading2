@@ -10,7 +10,7 @@ trading:
     - US
 
 risk:
-  max_notional_per_order: 50000
+  max_notional_per_order: 100000
   max_position_pct: 0.2
   daily_loss_limit: 10000
   signal_cooldown_seconds: 60

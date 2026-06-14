@@ -8,7 +8,7 @@ from collections import deque
 from dataclasses import dataclass, field
 
 from src.models.order import OrderRequest, OrderSide, OrderType, Position
-from src.models.signal import Signal
+from src.models.signal import Signal, SignalSide
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +94,12 @@ class RiskGuard:
     ) -> str | None:
         if not self._is_symbol_allowed(signal.symbol):
             return "symbol not in whitelist"
+
+        if signal.side == SignalSide.SELL:
+            pos = next((p for p in positions if p.symbol == signal.symbol), None)
+            held = pos.qty if pos else 0
+            if held < signal.qty:
+                return f"insufficient position to sell (have {held}, need {signal.qty})"
 
         notional = (signal.price or 0) * signal.qty
         if signal.order_type == "LIMIT" and notional > self._config.max_notional_per_order:

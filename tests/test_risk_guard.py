@@ -31,6 +31,14 @@ def test_approves_whitelisted_symbol():
     assert orders[0].symbol == "HK.00700"
 
 
+def test_rejects_sell_without_position():
+    guard = _guard()
+    signals = [
+        Signal(symbol="HK.00700", side=SignalSide.SELL, qty=100, price=10.0, reason="test")
+    ]
+    assert guard.validate(signals, positions=[]) == []
+
+
 def test_notional_limit():
     guard = _guard(max_notional_per_order=1000)
     signals = [

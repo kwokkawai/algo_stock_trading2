@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+from collections import defaultdict
 from typing import Literal
 
 from src.broker.futu_broker import FutuBroker
@@ -75,9 +76,7 @@ class Engine:
 
                 self._refresh_context()
                 bars = bar_feed.fetch_latest_bars(interval)
-                for bar in bars:
-                    signals = self._strategy.on_bar(bar, interval)
-                    self._execute_signals(signals)
+                self._process_bars(bars, interval)
 
                 if once:
                     break
@@ -112,6 +111,19 @@ class Engine:
         finally:
             self._strategy.on_stop(self._ctx)
             self._broker.disconnect()
+
+    def _process_bars(self, bars, interval: str) -> None:
+        """Warm up strategy on history; execute signals only on the latest bar per symbol."""
+        by_symbol: dict[str, list] = defaultdict(list)
+        for bar in bars:
+            by_symbol[bar.symbol].append(bar)
+
+        for symbol_bars in by_symbol.values():
+            for bar in symbol_bars[:-1]:
+                self._strategy.on_bar(bar, interval)
+            if symbol_bars:
+                signals = self._strategy.on_bar(symbol_bars[-1], interval)
+                self._execute_signals(signals)
 
     def _on_tick(self, tick) -> None:
         self._refresh_context()

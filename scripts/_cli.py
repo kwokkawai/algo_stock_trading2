@@ -37,6 +37,23 @@ def base_parser(description: str) -> argparse.ArgumentParser:
     return parser
 
 
+def status_parser(description: str) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--market", default="HK", choices=["HK", "US"], help="Trading market")
+    parser.add_argument(
+        "--env",
+        default="simulate",
+        choices=["simulate", "real"],
+        help="Trading environment (default: simulate)",
+    )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+    )
+    return parser
+
+
 def apply_env_override(settings: dict, env: str) -> dict:
     settings = dict(settings)
     trading = dict(settings.get("trading", {}))

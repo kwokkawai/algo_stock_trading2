@@ -4,7 +4,7 @@
 >
 > 图例：⬜ 待办 | 🔄 进行中 | ✅ 完成 | ⏸ 阻塞
 
-**当前阶段：** M1 完成 scaffold → **M2 模拟盘联调**
+**当前阶段：** M2 完成 → **M3 Intraday + 风控**
 
 ---
 
@@ -13,7 +13,7 @@
 | 里程碑 | 目标 | 状态 |
 |--------|------|------|
 | **M1** | Scaffold + Skills + 文档 + CI 骨架 | ✅ |
-| **M2** | 日 K Runner + SMA + 模拟盘联调 | 🔄 |
+| **M2** | 日 K Runner + SMA + 模拟盘联调 | ✅ |
 | **M3** | 1m intraday Runner + Risk Guard 验证 | ⬜ |
 | **M4** | Tick Runner + 频率风控 | ⬜ |
 | **M5** | 实盘路径 + 结构化日志 | ⬜ |
@@ -22,16 +22,16 @@
 
 ---
 
-## M2 — 模拟盘联调（当前）
+## M2 — 模拟盘联调 ✅
 
 | ID | 任务 | 状态 | 负责人 | 备注 |
 |----|------|------|--------|------|
-| M2-1 | 安装 OpenD，复制 `config/settings.yaml` | ⬜ | User | 需 Futu HK 登录 |
-| M2-2 | `pip install -r requirements.txt` + `make install-dev` | ⬜ | User/Agent | |
-| M2-3 | `run_paper.py --once` 连接 OpenD 成功 | ⬜ | Agent | 验证 quote + trade context |
-| M2-4 | SMA 策略产生信号并模拟下单 | ⬜ | Agent | 检查 order_id 日志 |
-| M2-5 | `status.py` 显示账户与持仓 | ⬜ | Agent | |
-| M2-6 | 修复联调中发现的问题 | ⬜ | Agent | |
+| M2-1 | 安装 OpenD，复制 `config/settings.yaml` | ✅ | User | OpenD 127.0.0.1:11111 |
+| M2-2 | `pip install -r requirements.txt` + `make install-dev` | ✅ | Agent | .venv 已就绪 |
+| M2-3 | `run_paper.py --once` 连接 OpenD 成功 | ✅ | Agent | quote + trade context OK |
+| M2-4 | SMA 策略产生信号并模拟下单 | ✅ | Agent | 模拟买单 order_id=7783826；最新 K 无交叉时不信号属正常 |
+| M2-5 | `status.py` 显示账户与持仓 | ✅ | Agent | 模拟账户 1,000,000 HKD |
+| M2-6 | 修复联调中发现的问题 | ✅ | Agent | 见 Changelog |
 
 ---
 
@@ -80,8 +80,8 @@
 
 ## Next（Agent 优先处理）
 
-1. **M2-1 ~ M2-3** — 用户准备 OpenD 后，Agent 协助跑通 `--once` 模拟盘
-2. 联调问题记录在此文件底部 **Changelog**
+1. **M3-1** — 交易时段跑 `run_paper.py --mode intraday --data 1m --once`
+2. **M3-2** — 验证 Risk Guard 白名单与 notional 上限
 
 ---
 
@@ -92,6 +92,7 @@
 | 2026-06-14 | M1 scaffold：代码、Skills、README、PRD |
 | 2026-06-14 | 添加 AGENTS.md、TASKS.md、CI、Cursor Rules/Hooks |
 | 2026-06-14 | INF-4: push 至 github.com/kwokkawai/algo_stock_trading2 |
+| 2026-06-14 | M2 联调：修复 config ROOT 路径；K 线仅对最新 bar 下单；无持仓拒绝 SELL；notional 上限 100k；status.py 无需 --strategy |
 
 ---
 
