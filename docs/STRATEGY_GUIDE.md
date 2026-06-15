@@ -48,6 +48,7 @@ flowchart LR
 | `donchian_breakout` | 趋势 | 收盘突破前 N 日最高 → BUY；跌破前 M 日最低 → SELL | entry=20, exit=10 | `donchian_breakout.yaml` |
 | `bollinger_rsi` | 均值回归 | 收盘 ≤ 下轨且 RSI 超卖 → BUY；≥ 上轨且 RSI 超买 → SELL | bb=20/2σ, rsi=14, 30/70 | `bollinger_rsi.yaml` |
 | `momentum_rotation` | 截面动量 | 对 watchlist 按 lookback 涨幅排名，持有 top N，其余 SELL | lookback=20, top_n=1 | `momentum_rotation.yaml` |
+| `sma_crossover_1m` | 趋势（M3） | 同上 SMA，**1 分钟 K**；M3 intraday 验收用 | fast=10, slow=30, 1m | `sma_crossover_1m.yaml` |
 
 **共同约定：**
 

@@ -4,7 +4,7 @@
 >
 > 图例：⬜ 待办 | 🔄 进行中 | ✅ 完成 | ⏸ 阻塞
 
-**当前阶段：** M2 + Journal + Automation 完成 → **M3 Intraday + 风控**
+**当前阶段：** **M3 Intraday + 风控**（Step 1–2 完成，待交易时段联调）
 
 ---
 
@@ -35,14 +35,25 @@
 
 ---
 
-## M3 — Intraday + 风控
+## M3 — Intraday + 风控 🔄
+
+**验收策略：** 单策略 `sma_crossover_1m`（1 分钟 K，标的 `HK.00700`）
 
 | ID | 任务 | 状态 |
 |----|------|------|
+| M3-0 | Engine：HK 交易时段 gate + bar 时间戳去重 | ✅ |
 | M3-1 | 1m bar feed 在交易时段稳定 polling | ⬜ |
 | M3-2 | Risk Guard 白名单 / 单笔上限实测 | ⬜ |
 | M3-3 | 冷却时间与重复信号去重 | ⬜ |
-| M3-4 | 补充 risk 相关单元测试 | ⬜ |
+| M3-4 | 补充 risk 相关单元测试 | ✅ |
+| M3-5 | `sma_crossover_1m.yaml` + registry | ✅ |
+
+### M3 完成标准（Done）
+
+- [ ] 交易时段 `run_paper.py --strategy sma_crossover_1m --mode intraday --once` 无致命错误
+- [ ] 交易时段 intraday **loop**（无 `--once`）连续 ≥30 分钟无崩溃
+- [ ] journal/日志中实测 ≥3 种 `risk_rejected`（见 TESTING Phase E）
+- [x] `make check` 含 session / bar dedup / risk 扩展测试
 
 ---
 
@@ -100,6 +111,7 @@
 | 2026-06-14 | **第一梯队策略**：ema_crossover、donchian_breakout、bollinger_rsi、momentum_rotation + indicators + 单元测试；STRATEGY_GUIDE 第 2 节 |
 | 2026-06-14 | **M5 journal**：SQLite 交易日志、Futu 订单/成交同步、日终 snapshot、report.py 日/周/月报表 |
 | 2026-06-14 | **Automation**：daily_run / weekly_report / monthly_report + launchd + docs/AUTOMATION.md；launchd PATH 修复 |
+| 2026-06-15 | **M3 Step 1–2**：HK 交易时段 gate、bar 去重、risk 扩展单测、sma_crossover_1m 配置 |
 
 ---
 

@@ -1,0 +1,12 @@
+# M3 — SMA crossover on 1-minute bars (single-strategy intraday acceptance)
+# Run: run_paper.py --strategy sma_crossover_1m --mode intraday --market HK --once
+
+name: sma_crossover_1m
+market: HK
+symbols:
+  - HK.00700
+params:
+  interval: "1m"
+  fast_period: 10
+  slow_period: 30
+  qty: 100

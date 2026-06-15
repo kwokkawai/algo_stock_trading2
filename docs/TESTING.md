@@ -81,7 +81,7 @@ make check
 ### 预期结果
 
 - `ruff check` 无错误
-- `pytest` 全部 PASSED（约 26 个测试）
+- `pytest` 全部 PASSED（约 39 个测试）
 - `compileall` 无报错
 
 ### 若失败
@@ -195,32 +195,51 @@ Signal rejected [...]: insufficient position to sell ...
 
 ## Phase D — 1 分钟 Intraday（M3 能力）
 
-在 **港股交易时段** 测试效果最佳。
+**M3 验收策略：** `sma_crossover_1m`（配置见 `config/strategies/sma_crossover_1m.yaml`，单标的 `HK.00700`）。
+
+在 **港股交易时段** 测试效果最佳（09:30–12:00、13:00–16:00 HKT）。
 
 ```bash
+# 推荐 — M3 专用 1m 配置
+.venv/bin/python scripts/run_paper.py \
+  --strategy sma_crossover_1m \
+  --mode intraday \
+  --market HK \
+  --once \
+  --log-level INFO
+
+# 等价写法（override interval）
 .venv/bin/python scripts/run_paper.py \
   --strategy sma_crossover \
   --mode intraday \
   --data 1m \
   --market HK \
-  --once \
-  --log-level INFO
+  --once
 ```
 
 ### 预期结果
 
-- 与 Phase C 类似：连接成功 → 拉 1 分钟 K 线 → 仅对**最新一根** bar 评估信号
-- `--once` 只跑一轮后退出（不会 sleep 60 秒循环）
+- 连接成功 → 拉 1 分钟 K 线 → 仅对**最新一根** bar 评估信号
+- `--once` 只跑一轮后退出（**非交易时段也可用 `--once` 测连接**）
+- 长时间 loop（无 `--once`）在**非交易时段**会日志 `Outside HK trading session` 并 sleep，不拉行情
+
+### Engine 行为（M3 Step 2）
+
+| 机制 | 说明 |
+|------|------|
+| **交易时段 gate** | intraday loop 仅在 HK 常规时段 polling |
+| **Bar 去重** | 同一 symbol 同一根 bar 时间戳不重复下单（PRD E-004） |
 
 ### 通过标准
 
 - [ ] 无连接/订阅致命错误
 - [ ] 日志中 `paper_only=True`
+- [ ] （交易时段）连续 loop ≥30 分钟无崩溃（M3-1 soak，可选）
 
 ### 注意
 
-- 非交易时段可能 K 线更新少，无信号属正常
-- 不加 `--once` 时会每 60 秒轮询（长时间运行用 Ctrl+C 停止）
+- 非交易时段 `--once` 可能 K 线更新少，无信号属正常
+- 不加 `--once` 时每 60 秒轮询；非交易时段自动 sleep（Ctrl+C 停止）
 
 ---
 
@@ -230,15 +249,15 @@ Signal rejected [...]: insufficient position to sell ...
 
 ### E1 — 标的白名单
 
-白名单仅允许：`HK.00700`, `HK.09988`, `US.AAPL`, `US.MSFT`。
+白名单见 `config/settings.yaml` → `risk.allowed_symbols`（当前含 `HK.00700` 等 watchlist 标的）。
 
-若策略 config 改用非白名单标的，应看到：
+若策略 config 改用非白名单标的（如 `HK.99999`），应看到：
 
 ```
-Signal rejected [HK.xxxxx]: symbol not in whitelist
+Signal rejected [HK.99999]: symbol not in whitelist
 ```
 
-（需改 `config/strategies/sma_crossover.yaml` 的 `symbols` 做实验，测完改回。）
+（可临时改 `config/strategies/sma_crossover_1m.yaml` 的 `symbols` 做实验，测完改回。）
 
 ### E2 — 单笔金额上限
 
@@ -248,13 +267,17 @@ Signal rejected [HK.xxxxx]: symbol not in whitelist
 Signal rejected [...]: notional ... exceeds max 100000
 ```
 
+单元测试已覆盖：`tests/test_risk_guard.py::test_notional_limit`
+
 ### E3 — 无持仓卖出
 
-无持仓时 SMA 死叉产生 SELL 信号：
+无持仓时 SELL 信号：
 
 ```
 Signal rejected [...]: insufficient position to sell (have 0, need 100)
 ```
+
+单元测试：`test_rejects_sell_without_position`
 
 ### E4 — 冷却时间
 
@@ -264,10 +287,23 @@ Signal rejected [...]: insufficient position to sell (have 0, need 100)
 Signal rejected [...]: cooldown (60s) not elapsed
 ```
 
+单元测试：`test_cooldown_rejects_rapid_repeat`
+
+### E5 — 仓位占比上限
+
+单笔买入后仓位超过 `max_position_pct`（默认 20%）：
+
+```
+Signal rejected [...]: position would exceed 20% of account
+```
+
+单元测试：`test_position_pct_limit`
+
 ### 通过标准
 
-- [ ] 至少观察到一种 `Signal rejected`（证明风控在工作）
-- [ ] 或通过 Phase C 成功下一笔模拟单后再测 SELL 拒绝
+- [ ] `make check` 通过（含 `test_risk_guard`、`test_trading_session`、`test_bar_execution`）
+- [ ] 联调：至少观察到一种 `Signal rejected` 或 journal `risk_rejected` 事件
+- [ ] 或通过 Phase C/D 成功下一笔模拟单后再测 SELL 拒绝
 
 ---
 

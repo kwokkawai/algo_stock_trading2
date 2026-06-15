@@ -11,12 +11,14 @@ from src.broker.futu_broker import FutuBroker
 from src.config import load_settings, load_strategy_config
 from src.data.bar_feed import BarFeed
 from src.data.tick_feed import TickFeed
+from src.engine.bar_execution import BarExecutionGate
 from src.journal.engine_hooks import (
     log_signals,
     open_journal,
     record_account_snapshot,
 )
 from src.journal.sync import sync_fills
+from src.market.session import is_trading_session
 from src.risk.guard import RiskGuard
 from src.strategy.base import StrategyContext
 from src.strategy.registry import get_strategy
@@ -58,6 +60,7 @@ class Engine:
         self._strategy_name = strategy_name
         self._journal = open_journal(self._settings)
         self._run_id: str | None = None
+        self._bar_gate = BarExecutionGate()
 
     def run(self, once: bool = False) -> None:
         if self._mode == "tick":
@@ -83,6 +86,19 @@ class Engine:
                 if self._risk.is_halted():
                     logger.warning("Engine halted by risk guard")
                     break
+
+                if (
+                    self._mode == "intraday"
+                    and not once
+                    and not is_trading_session(self._market)
+                ):
+                    logger.info(
+                        "Outside %s trading session — sleeping %ds",
+                        self._market,
+                        sleep_seconds,
+                    )
+                    time.sleep(sleep_seconds)
+                    continue
 
                 self._refresh_context()
                 bars = bar_feed.fetch_latest_bars(interval)
@@ -172,8 +188,16 @@ class Engine:
             for bar in symbol_bars[:-1]:
                 self._strategy.on_bar(bar, interval)
             if symbol_bars:
-                signals = self._strategy.on_bar(symbol_bars[-1], interval)
-                self._execute_signals(signals)
+                latest = symbol_bars[-1]
+                signals = self._strategy.on_bar(latest, interval)
+                if signals and self._bar_gate.should_execute(latest.symbol, latest.timestamp):
+                    self._execute_signals(signals)
+                elif signals:
+                    logger.debug(
+                        "Skip duplicate bar signals [%s] ts=%s",
+                        latest.symbol,
+                        latest.timestamp,
+                    )
 
     def _on_tick(self, tick) -> None:
         self._refresh_context()

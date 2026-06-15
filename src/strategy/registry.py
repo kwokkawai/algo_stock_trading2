@@ -11,6 +11,7 @@ from src.strategy.base import BaseStrategy
 
 STRATEGY_REGISTRY: dict[str, Type[BaseStrategy]] = {
     "sma_crossover": SmaCrossoverStrategy,
+    "sma_crossover_1m": SmaCrossoverStrategy,
     "ema_crossover": EmaCrossoverStrategy,
     "donchian_breakout": DonchianBreakoutStrategy,
     "bollinger_rsi": BollingerRsiStrategy,
